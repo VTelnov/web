@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shop</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header">
+    <div class = "container">
+        <div class ="header-line">
+            <div class="header-logo">
+                <img class="logo" src="images/logo.svg" alt="logo">
+            </div>
+                <a class="nav-item" href="index.html">HOME</a>
+                <a class="nav-item" href="shop.html">SHOP</a>
+
+
+            <div class="cart">
+                <a href="cart.html"> <img class="cart-image" src="images/cart.png" alt="cart"></a>
+                <span>Cart</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="itemsListShop"></div>
+
+
+
+<footer>
+    <div class="footer">
+        <div class="footer-text">
+            <p>© 2023 UCLan Cyprus Online Shop. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js">
+
+</script>
+<script>
+    //The code iterates over each item in the GlobalGoods object and dynamically creates HTML elements to display the item details on the page
+    const goods = window.GlobalGoods;
+    console.log(goods);
+    for (const key in goods) {
+        let output = document.createElement('div');
+        output.className = 'itemCard';
+        output.innerHTML = `<h3>` + goods[key].name + `</h3><p>Price: £` + goods[key].price + `</p>
+        <img src="` + goods[key].image +  `" + width="300px">
+        <button class="buyBtn" onclick="AddToCart(` + key  + `)" class="add-to-cart" id="addBtn" data-id="' + key + '">Buy</button>
+        <a href="item.html?id=` + key + `"><button class="info" data-id="` + key + `">Info</button></a>`;
+        document.getElementById('itemsListShop').appendChild(output);
+    }
+
+
+//checks the current state of the cart in local storage, adds the new item ID, updates the 'CART' in local storage, logs the updated cart and local storage to the console, and then displays an alert to indicate that the item has been added to the cart
+    function AddToCart(id) {
+        let currentCart = window.localStorage.getItem('CART');
+
+        if (currentCart) {
+            try {
+                currentCart = JSON.parse(currentCart);
+            } catch (e) {
+                currentCart = [];
+            }
+        } else {
+            currentCart = [];
+        }
+
+        if(Array.isArray(currentCart)) {
+            currentCart.push(id);
+        } else {
+            currentCart = [id];
+        }
+
+        window.localStorage.setItem('CART', JSON.stringify(currentCart))
+        console.log(currentCart);
+        console.log(window.localStorage);
+        alert(`Added to cart`);
+
+    }
+
+</script>
+
+</body>
+</html>

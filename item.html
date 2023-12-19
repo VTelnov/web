@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Online Shop</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    <div class="header">
+        <div class = "container">
+            <div class ="header-line">
+                <div class="header-logo">
+                    <img class="logo" src="images/logo.svg" alt="logo">
+                </div>
+                <a class="nav-item" href="index.html">HOME</a>
+                <a class="nav-item" href="shop.html">SHOP</a>
+                <div class="cart">
+                    <a href="cart.html"> <img class="cart-image" src="images/cart.png" alt="cart"></a>
+                    <span>Cart</span>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div id="itemCardID"></div>
+    </main>
+
+    <footer>
+        <div class="footer">
+            <div class="footer-text">
+                <p>© 2023 UCLan Cyprus Online Shop. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    </body>
+<script src="script.js">
+
+</script>
+<script>
+    //The code dynamically creates an item card based on the 'id' parameter from the URL and appends it to the specified container
+    const goods = window.GlobalGoods;
+    let URLPARAMS = window.location.search;
+    console.log(URLPARAMS);
+    const params = new URLSearchParams(URLPARAMS);
+    let id = params.get('id');
+
+
+    let itemCard = document.createElement('div');
+    itemCard.style.maxWidth = '500px';
+    itemCard.style.margin = '0 auto 0 auto';
+
+    itemCard.innerHTML = `
+        <img height="400px" src="` + goods[id].image + `"></img>
+        <h2>` + goods[id].name+ `</h2>
+        <div>` + goods[id].description + `</div>
+        <h3>£` + goods[id].price + `</h3><button class="buyBtn" onclick="AddToCart(` + id + `)">Add to Cart</button>`;
+    let itemCardContainer = document.getElementById('itemCardID');
+
+    itemCardContainer.appendChild(itemCard);
+
+    function AddToCart(id) {
+        let currentCart = window.localStorage.getItem('CART');
+
+        if (currentCart) {
+            try {
+                currentCart = JSON.parse(currentCart);
+            } catch (e) {
+                currentCart = [];
+            }
+        } else {
+            currentCart = [];
+        }
+
+        if(Array.isArray(currentCart)) {
+            currentCart.push(id);
+        } else {
+            currentCart = [id];
+        }
+
+        window.localStorage.setItem('CART', JSON.stringify(currentCart))
+        console.log(currentCart);
+        console.log(window.localStorage);
+        alert(`Added to cart`);
+
+    }
+
+
+</script>
+    </html>

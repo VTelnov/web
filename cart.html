@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shop-Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div>
+<div class="header">
+    <div class = "container">
+        <div class ="header-line">
+            <div class="header-logo">
+                <img class="logo" src="images/logo.svg" alt="logo">
+            </div>
+            <a class="nav-item" href="index.html">HOME</a>
+            <a class="nav-item" href="shop.html">SHOP</a>
+            <div class="cart">
+                <a href="cart.html"> <img class="cart-image" src="images/cart.png" alt="cart"></a>
+                <span>Cart</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<main>
+    <div  style="display: flex; margin-top: 24px; flex-direction: column; max-width: 1280px; align-items: center; margin-left: auto; margin-right: auto">
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px" id="cartList" >
+
+
+    </div>
+    <div id="priceCard"></div>
+    </div>
+</main>
+</div>
+
+<footer>
+    <div class="footer">
+        <div class="footer-text">
+            <p>© 2023 UCLan Cyprus Online Shop. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+<script src="script.js"></script>
+<script>
+    console.log(window.localStorage);
+    document.onload(RenderCart());
+    // Function to render the items in the cart
+    function RenderCart () {
+        // Clear the existing content inside the element with the ID 'cartList'
+        document.getElementById('cartList').innerHTML = '';
+        if (window.localStorage.getItem('CART')) {
+            // Retrieve the cart items from local storage and process the data
+            let cartArray = window.localStorage.getItem('CART').replace(/^\[/, '').replace(/\]$/, '');
+            let cartItems = cartArray.split(',');
+            // Get unique items in the cart using Set and convert it back to an array
+            let cartItemsUnique = Array.from(new Set(cartItems));
+            console.log(cartItemsUnique);
+            let extraInfoID = countItemsById(cartItems);
+            console.log(extraInfoID);
+
+            cartItemsUnique.forEach((id) => {
+                // Create a new div element for each item
+                let el = document.createElement('div');
+                el.className = 'cartItemCard';
+                // Apply styles to the div for visual presentation
+                el.style.borderRadius = '8px'
+                el.style.padding = '8px';
+                el.style.width = '350px';
+                el.innerHTML = `<div>` + window.GlobalGoods[id].name + `</div>
+                <div>` + window.GlobalGoods[id].price +`</div>
+                <img height="100px" src="` + window.GlobalGoods[id].image+ `" />
+                <div>Items: ` + extraInfoID[id] +`</div>
+                <button onclick="deleteFromCart(` + id + `)">Remove from cart</button>
+<button onclick="decreaseItemsWithID(` + id + `)">-</button>
+<button onclick="AddToCart(` + id + `)">+</button>`;
+                // Append the newly created div to the element with the ID 'cartList'
+                document.getElementById('cartList').appendChild(el);
+                // Call a function to calculate and display the total price
+                calculateTotalPrice();
+
+            });
+// If the cart is empty, display a message and a link to the shop page
+        } else {
+            let el = document.createElement('div');
+            el.style.display = 'flex';
+            el.style.alignItems = 'center';
+            el.style.flexDirection = 'column';
+            el.innerHTML = `<div style="font-size: 64px;text-align: center">CART IS EMPTY</div><a href="shop.html" style="text-align: center;margin-top: 24px; width: fit-content; padding: 4px 12px 4px 12px;border: 1px solid black; border-radius: 4px;margin-right: auto; background: green; color: white; margin-left: auto">\> GO TO SHOP \<</a>`;
+            document.getElementById('cartList').appendChild(el);
+            // Clear the content inside the element with the ID 'priceCard'
+            document.getElementById('priceCard').innerHTML = '';
+        }
+
+    }
+
+//The function uses the filter method to create a new array (updatedCart) without the item to be removed, updates the 'CART' in local storage, and then reloads the page to reflect the changes in the cart
+    function deleteFromCart(idToRemove) {
+        let cartArray = window.localStorage.getItem('CART').replace(/^\[/, '').replace(/\]$/, '');
+        // Split the cart items into an array
+        let cartItems = cartArray.split(',');
+        let updatedCart = cartItems.filter((itemID) => {return itemID !== idToRemove.toString()});
+        // Update the 'CART' in local storage with the updated array
+        window.localStorage.setItem('CART', updatedCart);
+        // Reload the page to reflect the changes in the cart
+        window.location.reload();
+    }
+
+//The function essentially creates an object (itemCounts) where the keys are item IDs, and the values are the counts of each item ID in the cart
+    function countItemsById(cartArray) {
+        const itemCounts = cartArray.reduce((acc, id) => {
+            acc[id] = (acc[id] || 0) + 1;
+            return acc;
+        }, {});
+
+        return itemCounts;
+    }
+    // Function to calculate and display the total price of items in the cart
+    function calculateTotalPrice () {
+        document.getElementById('priceCard').innerHTML = '';
+        let cartArray = window.localStorage.getItem('CART').replace(/^\[/, '').replace(/\]$/, '');
+        let totalPrice = 0;
+        let cartItems = cartArray.split(',');
+// Iterate over each item in the cart
+        cartItems.forEach((itemID) => {
+            // Add the price of the item to the total price
+            totalPrice += Math.round(window.GlobalGoods[itemID].price)})
+        console.log(totalPrice);
+        let el = document.createElement('p');
+        el.innerText = 'Total Price: £' + totalPrice;
+        document.getElementById('priceCard').appendChild(el);
+
+    }
+
+   // The function finds the index of the item to be decreased in the cart, removes one instance of the item from the cart, updates the 'CART' in local storage, and then calls the RenderCart function to update the displayed cart
+    function decreaseItemsWithID (id) {
+        let cartArray = window.localStorage.getItem('CART').replace(/^\[/, '').replace(/\]$/, '');
+        let cartItems = cartArray.split(',');
+
+        let indexToRemove = cartItems.indexOf(id.toString());
+        console.log(cartItems);
+
+        console.log(indexToRemove);
+        // Check if the item to be decreased is found in the cart
+        if (indexToRemove !== -1) {
+            // Remove one instance of the item from the cart
+            cartItems.splice(indexToRemove, 1);
+        }
+
+        console.log(cartItems);
+        window.localStorage.setItem('CART', cartItems);
+        RenderCart();
+
+    }
+
+    function AddToCart(id) {
+        let currentCart = window.localStorage.getItem('CART');
+
+        if (currentCart) {
+            try {
+                // Attempt to parse the current cart as JSON
+                currentCart = JSON.parse(currentCart);
+            } catch (e) {
+                // If parsing fails, set the current cart to an empty array
+                currentCart = [];
+            }
+        } else {
+            // If the current cart doesn't exist, set it to an empty array
+            currentCart = [];
+        }
+// Check if the current cart is an array
+        if(Array.isArray(currentCart)) {
+            // Push the new item ID to the current cart array
+            currentCart.push(id);
+        } else {
+            // If the current cart is not an array, set it to a new array with the new item ID
+            currentCart = [id];
+        }
+// Update the 'CART' in local storage with the updated array
+        window.localStorage.setItem('CART', JSON.stringify(currentCart))
+        console.log(currentCart);
+        console.log(window.localStorage);
+        RenderCart();
+    }
+
+</script>
+</html>
